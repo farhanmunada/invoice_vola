@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>{{ config('app.name', 'Laravel') }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased text-gray-900 bg-gray-50">
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest"></script>
+
+        <div class="flex h-screen overflow-hidden">
+            <!-- Sidebar -->
+            <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
+                <!-- Logo -->
+                <div class="h-16 flex items-center px-6 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        @if(isset($globalSetting) && $globalSetting->logo_path)
+                            <img src="{{ asset('storage/' . $globalSetting->logo_path) }}" alt="Logo" class="h-8 w-auto object-contain">
+                        @else
+                            <i data-lucide="printer" class="h-8 w-8 text-blue-600"></i>
+                        @endif
+                        <span class="text-xl font-bold text-gray-800 tracking-tight">
+                            {{ $globalSetting->shop_name ?? config('app.name') }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Nav -->
+                <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                        Dashboard
+                    </a>
+                    
+                    <div class="pt-4 pb-2">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">Main Menu</span>
+                    </div>
+
+                    <a href="{{ route('invoices.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('invoices.*') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                        Invoices
+                    </a>
+                    
+                    <a href="{{ route('customers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('customers.*') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                        Customers
+                    </a>
+
+                    <div class="pt-4 pb-2">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">System</span>
+                    </div>
+
+                    <a href="{{ route('settings.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('settings.*') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                        Shop Settings
+                    </a>
+                </nav>
+
+                <!-- User Footer -->
+                <div class="p-4 border-t border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                            {{ substr(Auth::user()->name, 0, 1) }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
+                        </div>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button class="text-gray-400 hover:text-red-500 transition" title="Logout">
+                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <!-- Mobile Header -->
+                <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 md:hidden">
+                    <div class="font-bold text-xl text-blue-600">{{ config('app.name') }}</div>
+                    <button class="text-gray-500">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </header>
+
+                <!-- Scrollable Content -->
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+                    @isset($header)
+                        <div class="mb-6">
+                            {{ $header }}
+                        </div>
+                    @endisset
+
+                    {{ $slot }}
+                </main>
+            </div>
+        </div>
+        
+        <script>
+            lucide.createIcons();
+        </script>
+    </body>
+</html>

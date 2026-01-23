@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    /* Premium Palette (Invoice Vola Reborn) */
+    /* Dominant Blue: #0066FF */
+    --primary-h: 216;
+    --primary-s: 100%;
+    --primary-l: 50%;
+    --primary: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+
+    --secondary-h: 216;
+    --secondary-s: 100%;
+    --secondary-l: 95%;
+    /* Light Blue Background */
+    --secondary: hsl(var(--secondary-h), var(--secondary-s), var(--secondary-l));
+
+    --bg-body: #F3F4F6;
+    --bg-surface: #FFFFFF;
+
+    --text-main: #1F2937;
+    --text-muted: #6B7280;
+    --border-light: #E5E7EB;
+
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+
+    --font-outfit: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--bg-body);
+    font-family: var(--font-outfit);
+    color: var(--text-main);
+}
+
+/* Utilities */
+.font-outfit {
+    font-family: var(--font-outfit);
+}
+
+.card-premium {
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid white;
+}
+
+.input-premium {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 0.6rem 1rem;
+    transition: all 0.2s;
+    outline: none;
+    width: 100%;
+}
+
+.input-premium:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px hsl(var(--primary-h) var(--primary-s) var(--primary-l) / 0.15);
+}
