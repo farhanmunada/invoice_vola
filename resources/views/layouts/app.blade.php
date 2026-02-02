@@ -20,11 +20,15 @@
         <!-- Lucide Icons -->
         <script src="https://unpkg.com/lucide@latest"></script>
 
-        <div class="flex h-screen overflow-hidden">
+        <div class="flex h-screen overflow-hidden" x-data="{ sidebarOpen: false }">
+            
+            <!-- Mobile Overlay -->
+            <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 lg:hidden"></div>
+
             <!-- Sidebar -->
-            <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col print:hidden">
+            <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:static lg:flex flex-col print:hidden">
                 <!-- Logo -->
-                <div class="h-16 flex items-center px-6 border-b border-gray-100">
+                <div class="h-16 flex items-center justify-between px-6 border-b border-gray-100">
                     <div class="flex items-center gap-3">
                         @if(isset($globalSetting) && $globalSetting->logo_path)
                             <img src="{{ asset('storage/' . $globalSetting->logo_path) }}" alt="Logo" class="h-8 w-auto object-contain">
@@ -35,6 +39,10 @@
                             {{ $globalSetting->shop_name ?? config('app.name') }}
                         </span>
                     </div>
+                    <!-- Close Button (Mobile) -->
+                    <button @click="sidebarOpen = false" class="lg:hidden text-gray-500 hover:text-gray-700">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
                 </div>
 
                 <!-- Nav -->
@@ -96,9 +104,13 @@
             <!-- Main Content -->
             <div class="flex-1 flex flex-col overflow-hidden">
                 <!-- Mobile Header -->
-                <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 md:hidden print:hidden">
-                    <div class="font-bold text-xl text-blue-600">{{ config('app.name') }}</div>
-                    <button class="text-gray-500">
+                <header class="bg-white border-b border-gray-200 min-h-[4rem] flex items-center justify-between px-4 lg:hidden print:hidden">
+                    <div class="flex-1 mr-4">
+                        @isset($header)
+                            {{ $header }}
+                        @endisset
+                    </div>
+                    <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 hover:text-gray-700 focus:outline-none flex-shrink-0">
                         <i data-lucide="menu" class="w-6 h-6"></i>
                     </button>
                 </header>
@@ -106,7 +118,7 @@
                 <!-- Scrollable Content -->
                 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
                     @isset($header)
-                        <div class="mb-6">
+                        <div class="mb-6 hidden lg:block">
                             {{ $header }}
                         </div>
                     @endisset
