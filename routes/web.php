@@ -27,6 +27,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('invoices', App\Http\Controllers\InvoiceController::class);
 
     Route::get('reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+
+    // Hidden Feature: Dummy Invoice Generator
+    Route::get('secret-invoice-generator', [App\Http\Controllers\DummyInvoiceController::class, 'create'])->name('dummy.create');
+    Route::post('secret-invoice-generator', [App\Http\Controllers\DummyInvoiceController::class, 'store'])->name('dummy.store');
 });
+
 
 require __DIR__.'/auth.php';
