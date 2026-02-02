@@ -6,10 +6,11 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function __invoke()
+    public function __invoke(Request $request)
     {
         // 1. Income Today (Omzet Hari Ini) - Based on Payments received today
         $todayIncome = Payment::whereDate('paid_at', Carbon::today())->sum('amount');
@@ -30,6 +31,51 @@ class DashboardController extends Controller
         // 5. Recent Invoices
         $recentInvoices = Invoice::with('customer')->latest()->take(5)->get();
 
+        // 6. Chart Data Logic
+        $filter = $request->input('filter', 'daily'); // Default to daily
+        $chartLabels = [];
+        $chartData = [];
+
+        if ($filter === 'monthly') {
+            // Monthly Logic (Current Year)
+            $startOfYear = Carbon::now()->startOfYear();
+            $endOfYear = Carbon::now()->endOfYear();
+
+            $invoices = Invoice::where('status', 'paid')
+                ->whereBetween('date', [$startOfYear, $endOfYear])
+                ->get()
+                ->groupBy(function($date) {
+                    return Carbon::parse($date->date)->format('M'); // Jan, Feb...
+                });
+            
+            // Fill all 12 months to ensure continuity
+            $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            foreach ($months as $month) {
+                $chartLabels[] = $month;
+                $chartData[] = isset($invoices[$month]) ? $invoices[$month]->sum('total_amount') : 0;
+            }
+
+        } else {
+            // Daily Logic (Last 30 Days)
+            $startDate = Carbon::today()->subDays(29);
+            $endDate = Carbon::today();
+
+            $invoices = Invoice::where('status', 'paid')
+                ->whereBetween('date', [$startDate, $endDate])
+                ->get()
+                ->groupBy(function($date) {
+                    return Carbon::parse($date->date)->format('d M');
+                });
+
+            // Loop through last 30 days
+            for ($i = 0; $i < 30; $i++) {
+                $date = $startDate->copy()->addDays($i);
+                $key = $date->format('d M');
+                $chartLabels[] = $key;
+                $chartData[] = isset($invoices[$key]) ? $invoices[$key]->sum('total_amount') : 0;
+            }
+        }
+
         return view('dashboard', compact(
             'todayIncome', 
             'monthlyIncome', 
@@ -37,7 +83,10 @@ class DashboardController extends Controller
             'pendingCount',
             'partialCount',
             'paidCount',
-            'recentInvoices'
+            'recentInvoices',
+            'chartLabels',
+            'chartData',
+            'filter'
         ));
     }
 }

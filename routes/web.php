@@ -23,7 +23,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('customers', App\Http\Controllers\CustomerController::class);
     Route::get('invoices/{invoice}/print', [App\Http\Controllers\InvoiceController::class, 'print'])->name('invoices.print');
     Route::post('invoices/{invoice}/payment', [App\Http\Controllers\InvoiceController::class, 'addPayment'])->name('invoices.payment');
+    Route::delete('payments/{payment}', [App\Http\Controllers\PaymentController::class, 'destroy'])->name('payments.destroy');
     Route::resource('invoices', App\Http\Controllers\InvoiceController::class);
+
+    Route::get('reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
 });
 
 require __DIR__.'/auth.php';

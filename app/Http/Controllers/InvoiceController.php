@@ -167,4 +167,9 @@ class InvoiceController extends Controller
 
         return back()->with('status', 'Payment added successfully.');
     }
+    public function destroy(Invoice $invoice)
+    {
+        $invoice->delete();
+        return redirect()->route('invoices.index')->with('status', 'Invoice deleted successfully.');
+    }
 }

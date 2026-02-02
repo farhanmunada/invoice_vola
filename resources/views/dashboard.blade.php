@@ -14,6 +14,20 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             
+            <!-- Revenue Chart -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-xl p-6 border border-gray-100">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">Paid Invoice Revenue (Omzet)</h3>
+                    <div class="flex space-x-2">
+                        <a href="{{ request()->fullUrlWithQuery(['filter' => 'daily']) }}" class="px-3 py-1 text-xs font-semibold rounded-md {{ $filter == 'daily' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Daily (30 Days)</a>
+                        <a href="{{ request()->fullUrlWithQuery(['filter' => 'monthly']) }}" class="px-3 py-1 text-xs font-semibold rounded-md {{ $filter == 'monthly' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Monthly (This Year)</a>
+                    </div>
+                </div>
+                <div class="relative h-72 w-full">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
             <!-- Cards Overview -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Card 1: Income Today -->
@@ -137,4 +151,75 @@
 
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            // Gradient fill
+            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)'); // Blue 500 equivalent
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode($chartLabels) !!},
+                    datasets: [{
+                        label: 'Total Paid (Rp)',
+                        data: {!! json_encode($chartData) !!},
+                        borderColor: '#2563eb', // Blue 600
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4, // Smooth curve
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                borderDash: [2, 4],
+                                color: '#f3f4f6'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumSignificantDigits: 3 }).format(value);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>

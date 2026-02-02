@@ -4,7 +4,14 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Invoice Details') }} : {{ $invoice->invoice_number }}
             </h2>
-            <div class="space-x-2">
+            <div class="space-x-2 flex items-center">
+                <form method="POST" action="{{ route('invoices.destroy', $invoice) }}" class="inline-block" onsubmit="return confirm('Are you sure you want to DELETE this invoice? This action cannot be undone.');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 transition">
+                        {{ __('Delete') }}
+                    </button>
+                </form>
                 <a href="{{ route('invoices.print', $invoice) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                     {{ __('Print A5') }}
                 </a>
@@ -95,6 +102,43 @@
                         </div>
                     </div>
 
+                </div>
+
+                <!-- Payment History -->
+                <div class="bg-white dark:bg-gray-800 px-8 py-6 border-t border-gray-200 dark:border-gray-600">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Payment History</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th class="px-4 py-2">Date</th>
+                                    <th class="px-4 py-2">Method</th>
+                                    <th class="px-4 py-2 text-right">Amount</th>
+                                    <th class="px-4 py-2 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($invoice->payments->sortByDesc('created_at') as $payment)
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                        <td class="px-4 py-2">{{ $payment->created_at->format('d M Y H:i') }}</td>
+                                        <td class="px-4 py-2 uppercase">{{ $payment->method }}</td>
+                                        <td class="px-4 py-2 text-right">Rp {{ number_format($payment->amount, 0, ',', '.') }}</td>
+                                        <td class="px-4 py-2 text-center">
+                                            <form action="{{ route('payments.destroy', $payment) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this payment?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900 font-bold">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-2 text-center">No payments recorded.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Add Payment Section (Only if remaining > 0) -->

@@ -22,7 +22,7 @@
 
         <div class="flex h-screen overflow-hidden">
             <!-- Sidebar -->
-            <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
+            <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col print:hidden">
                 <!-- Logo -->
                 <div class="h-16 flex items-center px-6 border-b border-gray-100">
                     <div class="flex items-center gap-3">
@@ -58,6 +58,11 @@
                         Customers
                     </a>
 
+                    <a href="{{ route('reports.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('reports.*') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                        Reports
+                    </a>
+
                     <div class="pt-4 pb-2">
                         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">System</span>
                     </div>
@@ -91,7 +96,7 @@
             <!-- Main Content -->
             <div class="flex-1 flex flex-col overflow-hidden">
                 <!-- Mobile Header -->
-                <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 md:hidden">
+                <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 md:hidden print:hidden">
                     <div class="font-bold text-xl text-blue-600">{{ config('app.name') }}</div>
                     <button class="text-gray-500">
                         <i data-lucide="menu" class="w-6 h-6"></i>
